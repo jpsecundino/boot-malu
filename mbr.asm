@@ -1,95 +1,189 @@
-	;; mbr.asm - A simple x86 bootloader example.
-	;;
-	;; In worship to the seven hacker gods and for the honor 
-	;; of source code realm, we hereby humbly offer our sacred 
-	;; "Hello World" sacrifice. May our code remain bugless.
+org 0x7c00
 
-	
-	org 0x7c00		; Our load address
+xor 	ax, ax
+mov 	ds, ax
+mov 	es, ax
+mov 	fs, ax
+mov 	gs, ax
+jmp 	init
 
+;Strings 
+start1: 	db 'So you traveled abroad and have no idea what to wear today?', 0xd, 0xa, 0x0
+start2: 	db 'We can help you build your look of the day!', 0xd, 0xa, 0x0
+temp:		db 'What is the local temperature?', 0xd, 0xa, 0x0
+
+v_sunny_msg:	db 'Hotter than hell! You can wear your bikini today!', 0xd, 0xa, 0x0
+sunny_msg:		db 'Good day to wear shorts and a t-shirt', 0xd, 0xa, 0x0
+cold_msg:		db 'Do not leave without a coat!', 0xd, 0xa, 0x0
+v_cold_msg:		db 'Wear at least 3 layers of clothes today!', 0xd, 0xa, 0x0
+
+nl:	db 0xd, 0xa, 0x0
+
+init:
+	mov 	ah, 0xe		; Configure BIOS teletype mode
+
+	mov		bx, start1
+	call 	print_string 
 	
-	;; Ensure segment:offset values are ok after program is loaded 
- 
-	xor ax, ax
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
+	mov		bx, start2
+	call 	print_string 
+
+	mov bx, temp
+	call print_string
+
+	call read_input
+	mov dx, bx			;; dx guarda o valor da temperatura
+
+	mov bx, nl
+	call print_string
+
+	jmp c_to_f
+
 	jmp init
 
-init:	
-	mov ah, 0xe		; Configure BIOS teletype mode
+;	mov 	bx, 0		; May be 0 because org directive.
+;	jmp 	stop
 
-	mov bx, 0		; May be 0 because org directive.
+;; ---------------------------------------
+;; ---- Celsius to Fahrenheit ------------
+;; ---------------------------------------
+c_to_f:
+	push ax	;; auxiliar
+	push cx ;; auxiliar
+	push dx	;; valor da temp
 
-loop:				; Write a 0x0-terminated ascii string
-	mov al, [here + bx]	
-	int 0x10
-	cmp al, 0x0
-	je end
-	add bx, 0x1		
-	jmp loop
+	mov cx, 0x2
+	mov ax, dx		;; ax armazena temporariamente 
+	mul cx			;; ax = ax * cx
 
-end:				; Jump forever (same as jmp end)
-	jmp $
+	add ax, 0x20	;;
 
-here:				; C-like NULL terminated string
+	mov cx, ax
+	cmp cx, 0x44	;; compara o resultado da conversao com 68ºF (20ºC)
+	jle winter		;; break se menor que 68ºF
+	jg summer		;; break se maior que 68ºF
 
-	db 'Hello world!', 0xd, 0xa, 0x0
+	pop dx
+	pop cx
+	pop ax
+
+	ret
+
+summer:
+	cmp cx, 0x5F
+	jge very_hot
+	jl hot
+	ret
+
+winter:
+	cmp cx, 0x35
+	jl very_cold
+	jge cold
+	ret
+
+;; ---------------------------------------
+;; ---- Print very sunny weather message ------
+;; ---------------------------------------
+very_hot:
+	mov bx, v_sunny_msg
+	call print_string
+	ret
+
+;; ---------------------------------------
+;; ---- Print sunny weather message ------
+;; ---------------------------------------
+hot:
+	mov bx, sunny_msg
+	call print_string
+	ret
+
+;; ---------------------------------------
+;; ---- Print cold weather message ------
+;; ---------------------------------------
+cold:
+	mov bx, cold_msg
+	call print_string
+	ret
+
+;; ---------------------------------------
+;; ---- Print very cold weather message ------
+;; ---------------------------------------
+very_cold:
+	mov bx, v_cold_msg
+	call print_string
+	ret
+
+;; ---------------------------------------
+;; ---- Prints some string ----------------
+;; parameters:
+;;	bx: string 
+;; ---------------------------------------
+print_string:
+	push 	ax
+	push 	bx
+
+loop_print:
+	mov 	al, [bx]
 	
-	times 510 - ($-$$) db 0	; Pad with zeros
-	dw 0xaa55		; Boot signature
+	cmp 	al, 0x0
+	je 		end_loop_print
 
-		
-	;; Notes (remove these comments for your code).
-	;; 
-	;; This assembly source code is written for x86 architecture in intel 
-	;; syntax and NASM  assembler dialect. It's mean to be compiled with 
-	;; NASM assembler.
-	;; 
-	;; A label (such as 'loop:') is interpreted by the prepossessesor as
-	;; the offset to (byte count at) the next command (jmp instruction, 
-	;; in this example).
-	;; 
-	;; The directive org 0x7c00 intructs the compiler to automatically
-	;; add the load address to the offset when necessary. Therefore,
-	;; 'mov al, label' virtually becomes 'mov al, label + 0x7c00'. 
-	;; 
-	;; BIOS interruption 'int 0x10' causes the execution flow to jump to 
-	;; the interruption vector table area, where there is a pre-loaded BIOS
-	;; routine capable of outputing characters to the video controller.
-	;; This interruption handler routine reads the byte at the 8-bit
-	;; register and send to the video controller. The video operation
-	;; mode (e.g. ascii character) is controlled by register ah.
-	;; After completing the operation, execution flow is returned to
-	;; the next line after 'int' instruction.
-	;;
-	;; The argument of jmp and je instructions, here, is a relative offset. 
-	;;
-	;; The line db causes the ouput of 1-byte patters at the current
-	;; position in the generated machine code. For instance, the string
-	;; 'Hello World' followed by newline and return ascii codes is inserted
-	;; in the given location.
-	;; 
-	;; The directive 'times X Y' produces a sequence of X repetitions of
-	;; of Y. The type specification 'db' means that Y is a byte (8 bits).
-	;; If it were dw, it would mean 'word', i.e. 16 bits.
-	;;
-	;; Symbol $  denotes the address of (byte count at) the current line.
-	;; Symbol $$ denotes the address of (byte count at) the start of current
-	;; section (in present case, we have only one section). Therefore, the
-	;; value ($-$$) is the current address minus the address of the
-	;; program start. We need 510 minus this amount of zeros.
-	;;
-	;; The line dw causes the output of the 2-byte pattern for the boot
-	;; signature at the current position (positions 511 and 512).
-	;;
-	;; Tip: the first lines after "org directive" are meant ot
-	;; setup correct values to segment registers after loading.
-	;; This is necessary because some 'bugged' BIOS leave us at
-	;; 0x7C00:0x0000, not in 0x0000:0x7C00, that is the same place,
-	;; but with offset 0. Briefly, we zero the involved segment registers
-	;; and jump to init, which causes its address 0x7c00 to be suitably
-	;; loaded into the segment:offset registers. Without this, your usb
-	;; stick may not boot into your physical computer.
+	call 	put_char
+	add 	bx, 0x1
+	
+	jmp 	loop_print
 
+end_loop_print:
+	pop 	bx
+	pop 	ax
+	ret
+
+;; ---------------------------------------
+;; ---- Reads input ----------------------
+;; ---------------------------------------
+read_input:
+	push ax
+	push cx
+
+	mov bx, 0
+	
+loop_read_input:
+	mov ah, 0x0
+	int 0x16
+
+	cmp al, 13
+	je end_loop_read_input
+
+	mov ah, 0xe
+	int 0x10
+
+	movzx dx, al
+	sub dx, '0'
+
+	imul bx, 0xa
+	add bx, dx
+
+	jmp loop_read_input
+
+end_loop_read_input:
+	pop cx
+	pop ax
+	ret
+
+;; ---------------------------------------
+;; ---- Prints one char ------------------
+;; ---------------------------------------
+put_char:
+	push 	ax
+
+	mov 	ah, 0x0e
+	int 	0x10
+
+	pop 	ax
+	ret
+
+stop:
+	jmp stop
+
+times 510 - ($-$$) db 0
+dw 0xaa55
