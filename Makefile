@@ -4,12 +4,12 @@
 # If unsure, check with 'fdisk -l', 'cat /proc/mounts' etc.
 # Warning, if your accidentally indicate your HD, you may be in trouble.
 
-STICK = /dev/sdb
+STICK = /dev/sdb1
 
 # From here down, you probably don't need to change anything.
 
 MBR = mbr.bin
-QEMU=qemu-system-i386
+QEMU = qemu-system-i386
 ISO = boot.iso
 FLOPPY = floppy.img
 

@@ -32,7 +32,7 @@ init:
 	call print_string
 
 	call read_input
-	mov dx, bx			;; dx guarda o valor da temperatura
+	mov dx, bx			; dx guarda o valor da temperatura
 
 	mov bx, nl
 	call print_string
