@@ -1,3 +1,13 @@
+;; Copyright (c) 2019 - Luiza Machado (lmach@usp.br) & Marina Machado (marinaf.machado@usp.br)
+;;
+;; This is free software and distributed under GNU GPL vr.3. Please 
+;; refer to the companion file LICENSING or to the online documentation
+;; at https://www.gnu.org/licenses/gpl-3.0.txt for further information.
+
+;; This program is capable of, given a certain temperature in Celsius, convert it to
+;; Fahrenheit and, following some pre-defined parameters, recommend an outfit for the 
+;; day.
+
 org 0x7c00
 
 xor 	ax, ax
@@ -7,7 +17,7 @@ mov 	fs, ax
 mov 	gs, ax
 jmp 	init
 
-;Strings 
+;; Strings 
 start1: 	db 'So you traveled abroad and have no idea what to wear today?', 0xd, 0xa, 0x0
 start2: 	db 'We can help you build your look of the day!', 0xd, 0xa, 0x0
 temp:		db 'What is the local temperature?', 0xd, 0xa, 0x0
@@ -44,9 +54,7 @@ init:
 ;	mov 	bx, 0		; May be 0 because org directive.
 ;	jmp 	stop
 
-;; ---------------------------------------
-;; ---- Celsius to Fahrenheit ------------
-;; ---------------------------------------
+;; --- Celsius to Fahrenheit ---
 c_to_f:
 	push ax	;; auxiliar
 	push cx ;; auxiliar
@@ -81,78 +89,43 @@ winter:
 	jge cold
 	ret
 
-;; ---------------------------------------
-;; ---- Print very sunny weather message ------
-;; ---------------------------------------
+;; --- Print very sunny weather message ---
 very_hot:
 	mov bx, v_sunny_msg
 	call print_string
 	ret
 
-;; ---------------------------------------
-;; ---- Print sunny weather message ------
-;; ---------------------------------------
+;; ----Print sunny weather message ---
 hot:
 	mov bx, sunny_msg
 	call print_string
 	ret
 
-;; ---------------------------------------
-;; ---- Print cold weather message ------
-;; ---------------------------------------
+;; --- Print cold weather message ---
 cold:
 	mov bx, cold_msg
 	call print_string
 	ret
 
-;; ---------------------------------------
-;; ---- Print very cold weather message ------
-;; ---------------------------------------
+;; --- Print very cold weather message ---
 very_cold:
 	mov bx, v_cold_msg
 	call print_string
 	ret
 
-;; ---------------------------------------
-;; ---- Prints some string ----------------
-;; parameters:
-;;	bx: string 
-;; ---------------------------------------
-print_string:
-	push 	ax
-	push 	bx
-
-loop_print:
-	mov 	al, [bx]
-	
-	cmp 	al, 0x0
-	je 		end_loop_print
-
-	call 	put_char
-	add 	bx, 0x1
-	
-	jmp 	loop_print
-
-end_loop_print:
-	pop 	bx
-	pop 	ax
-	ret
-
-;; ---------------------------------------
-;; ---- Reads input ----------------------
-;; ---------------------------------------
+;; --- Read input ---
 read_input:
 	push ax
 	push cx
 
 	mov bx, 0
 	
-loop_read_input:
+read_input_loop:
 	mov ah, 0x0
 	int 0x16
 
 	cmp al, 13
-	je end_loop_read_input
+	je end_read_input_loop
 
 	mov ah, 0xe
 	int 0x10
@@ -163,17 +136,36 @@ loop_read_input:
 	imul bx, 0xa
 	add bx, dx
 
-	jmp loop_read_input
+	jmp read_input_loop
 
-end_loop_read_input:
+end_read_input_loop:
 	pop cx
 	pop ax
 	ret
 
-;; ---------------------------------------
-;; ---- Prints one char ------------------
-;; ---------------------------------------
-put_char:
+;; --- Print a string ---
+print_string:
+	push 	ax
+	push 	bx
+
+print_string_loop:
+	mov 	al, [bx]
+	
+	cmp 	al, 0x0
+	je 		end_print_string_loop
+
+	call 	put_char
+	add 	bx, 0x1
+	
+	jmp 	print_string_loop
+
+end_print_string_loop:
+	pop 	bx
+	pop 	ax
+	ret
+
+;; --- Print a char ---
+print_char:
 	push 	ax
 
 	mov 	ah, 0x0e
