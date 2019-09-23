@@ -1,4 +1,4 @@
-;; Copyright (c) 2019 - Luiza Machado (lmach@usp.br) & Marina Machado (marinaf.machado@usp.br)
+;; Copyright (c) 2019 - Luiza Machado (lmach@usp.br) & Marina Machado (marina.fmachado@usp.br)
 ;;
 ;; This is free software and distributed under GNU GPL vr.3. Please 
 ;; refer to the companion file LICENSING or to the online documentation

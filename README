@@ -1,5 +1,5 @@
  Copyright (c) 2019 - Luiza P. P. M. <lmach@usp.br>
- 					  Marina F. A. M. <marinaf.machado@usp.br>
+ 					  Marina F. A. M. <marina.fmachado@usp.br>
  
  This is free software and distributed under GNU GPL vr.3. Please refer 
  to the companion file LICENSING or to the online documentation at
@@ -9,3 +9,29 @@
 The following source code is capable of, given a certain temperature value in Celsius,
 convert it to Fahrenheit and, following a table of parameters, recommend an outfit
 according to the weather provided.
+
+The code is composed of strings, responsible for the interaction between computer and user, and functions. The descriptions of these functions are:
+
+> init: main function, calls other functions.
+
+> c_to_f: converts a given temperature from Celsius to Fahrenheit
+
+> summer: evaluates how hot is the weather provided
+
+> winter: evaluates how cold is the weather provided
+
+> very_hot: prints the very hot weather message
+
+> hot: prints the hot weather message
+
+> cold: prints the cold weather message
+
+> very_cold: prints the very cold weather message
+
+> read_input, read_input_loop, end_read_input_loop: reads an input string
+
+> print_string, print_string_loop, end_print_string_loop: prints a string
+
+> print_char: prints a single char
+
+> stop: stops execution
