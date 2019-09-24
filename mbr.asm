@@ -154,7 +154,7 @@ print_string_loop:
 	cmp 	al, 0x0
 	je 		end_print_string_loop
 
-	call 	put_char
+	call 	print_char
 	add 	bx, 0x1
 	
 	jmp 	print_string_loop

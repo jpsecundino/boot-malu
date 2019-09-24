@@ -1,37 +1,63 @@
  Copyright (c) 2019 - Luiza P. P. M. <lmach@usp.br>
  					  Marina F. A. M. <marina.fmachado@usp.br>
  
- This is free software and distributed under GNU GPL vr.3. Please refer 
+  This is free software and distributed under GNU GPL vr.3. Please refer 
  to the companion file LICENSING or to the online documentation at
  https://www.gnu.org/licenses/gpl-3.0.txt for further information.
 
+WHAT IT IS
+-----------
 
-The following source code is capable of, given a certain temperature value in Celsius,
-convert it to Fahrenheit and, following a table of parameters, recommend an outfit
-according to the weather provided.
+  This is an exercise from our Operating Systems class, in which we should create 
+ a bootloader template using Assembly x86. The template for this assignment can be
+ found at https://github.com/monacofj/asm-bootloader-template
 
-The code is composed of strings, responsible for the interaction between computer and user, and functions. The descriptions of these functions are:
+  The following source code is capable of, given a certain temperature value in Celsius,
+ convert it to Fahrenheit and, following a table of parameters, recommend an outfit
+ according to the weather provided.
 
-> init: main function, calls other functions.
+WHAT YOU NEED
+--------------
 
-> c_to_f: converts a given temperature from Celsius to Fahrenheit
+  You'll need a standard modern GNU/Linux platform with binutils, nasm,
+ qemu, make and your preferred text editor.
 
-> summer: evaluates how hot is the weather provided
+  Read 'Makefile' for configuration directions.
 
-> winter: evaluates how cold is the weather provided
+BUILDING RULES
+---------------
 
-> very_hot: prints the very hot weather message
+ At the terminal prompt, command
 
-> hot: prints the hot weather message
+    $ make
 
-> cold: prints the cold weather message
+ builds your MBR image (boot loader binary).
 
-> very_cold: prints the very cold weather message
+ You may test it using the x86 emulator by issuing
 
-> read_input, read_input_loop, end_read_input_loop: reads an input string
+    $ make test
 
-> print_string, print_string_loop, end_print_string_loop: prints a string
+ In order to build a bootable ISO image for a USB memory stick, issue
 
-> print_char: prints a single char
+    $ make iso
 
-> stop: stops execution
+ and to test it, use
+
+    $ make test-iso
+
+ To copy the iso image to your physical USB memory stick, use
+
+    $ make stick
+
+ Other rules such as clean etc. work as usual.
+
+TROUBLESHOOTING
+----------------
+
+  If you have problems booting your image with the emulator, make sure your
+ image has the right size and boot signature. This is the main cause of
+ booting failures.
+
+  If you have problems booting your iso image through your USB stick, check
+ your BIOS configuration settings, specially boot options. You may need to
+ enable legacy BIOS support, or to disable security boot features. 
